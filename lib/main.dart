@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:myapp/models/pokemon.dart';
+import 'package:myapp/services/pokeapi_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,64 +11,67 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomePage(),
+    return MaterialApp(
+      title: 'PokeAPI App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      home: const PokemonListScreen(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class PokemonListScreen extends StatefulWidget {
+  const PokemonListScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<PokemonListScreen> createState() => _PokemonListScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
-  late Future<String> _futureMessage;
-  final String _apiUrl = 'https://blogapi-o9r4.onrender.com/';
+class _PokemonListScreenState extends State<PokemonListScreen> {
+  late Future<List<Pokemon>> _pokemonList;
 
   @override
   void initState() {
     super.initState();
-    _futureMessage = fetchMessage();
-  }
-
-  Future<String> fetchMessage() async {
-    final response = await http.get(Uri.parse(_apiUrl));
-
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      throw Exception('Failed to load message');
-    }
+    _pokemonList = PokeApiService().fetchPokemonList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('API Consumption'),
+        title: const Text('Pokémon List'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Center(
-        child: FutureBuilder<String>(
-          future: _futureMessage,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              return Text(
-                snapshot.data!,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              );
-            } else {
-              return const Text('No data found');
-            }
-          },
-        ),
+      body: FutureBuilder<List<Pokemon>>(
+        future: _pokemonList,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('URL')),
+                ],
+                rows: snapshot.data!.map((pokemon) {
+                  return DataRow(cells: [
+                    DataCell(Text(pokemon.name)),
+                    DataCell(Text(pokemon.url)),
+                  ]);
+                }).toList(),
+              ),
+            );
+          } else {
+            return const Center(child: Text('No data found'));
+          }
+        },
       ),
     );
   }
