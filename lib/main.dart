@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:myapp/models/pokemon.dart';
 import 'package:myapp/services/pokeapi_service.dart';
 
+// Importamos las nuevas pantallas
+import 'login_page.dart';
+import 'register_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -13,11 +17,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'PokeAPI App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: const PokemonListScreen(),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      // Cambiamos home por initialRoute
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/pokemon': (context) => const PokemonListScreen(),
+      },
     );
   }
 }
@@ -61,10 +68,12 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
                   DataColumn(label: Text('URL')),
                 ],
                 rows: snapshot.data!.map((pokemon) {
-                  return DataRow(cells: [
-                    DataCell(Text(pokemon.name)),
-                    DataCell(Text(pokemon.url)),
-                  ]);
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(pokemon.name)),
+                      DataCell(Text(pokemon.url)),
+                    ],
+                  );
                 }).toList(),
               ),
             );
