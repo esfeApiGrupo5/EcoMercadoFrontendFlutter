@@ -9,15 +9,20 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   final AuthService _authService = AuthService();
 
   bool _isLoading = false;
   String? _errorMessage;
 
   void _register() async {
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -25,13 +30,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
     try {
       final success = await _authService.register(
-        _nameController.text,
-        _emailController.text,
-        _passwordController.text,
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
 
       if (success) {
-        // Si se creó el usuario, lo mandamos al login
+        // Registro exitoso → ir al login
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/login');
       }
     } catch (e) {
@@ -49,53 +55,98 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Registro")),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: "Nombre",
-                border: OutlineInputBorder(),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Nombre
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: "Nombre",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) =>
+                    value == null || value.isEmpty ? "Ingrese su nombre" : null,
               ),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: "Correo",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: "Contraseña",
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              ElevatedButton(
-                onPressed: _register,
-                child: const Text("Registrarse"),
-              ),
-
-            if (_errorMessage != null) ...[
               const SizedBox(height: 15),
-              Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.red),
+
+              // Correo
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: "Correo",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Ingrese su correo";
+                  }
+                  final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                  if (!emailRegex.hasMatch(value)) {
+                    return "Correo inválido";
+                  }
+                  return null;
+                },
               ),
+              const SizedBox(height: 15),
+
+              // Contraseña
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  labelText: "Contraseña",
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Ingrese una contraseña";
+                  }
+                  if (value.length < 6) {
+                    return "La contraseña debe tener al menos 6 caracteres";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // Botón
+              if (_isLoading)
+                const CircularProgressIndicator()
+              else
+                ElevatedButton(
+                  onPressed: _register,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text("Registrarse"),
+                ),
+
+              const SizedBox(height: 10),
+
+              // Link a login
+              TextButton(
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, '/login'),
+                child: const Text("¿Ya tienes cuenta? Inicia sesión"),
+              ),
+
+              // Mensaje de error
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 15),
+                Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

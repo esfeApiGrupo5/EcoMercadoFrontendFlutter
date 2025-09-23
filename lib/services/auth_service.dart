@@ -4,20 +4,26 @@ import 'package:http/http.dart' as http;
 class AuthService {
   final String baseUrl = "https://usuarioapi-nflv.onrender.com";
 
+  /// LOGIN
   Future<String?> login(String email, String password) async {
     final url = Uri.parse("$baseUrl/api/auth/login");
 
-    final response = await http.post(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: jsonEncode({
-        "correo": email, // 👈 Ojo, aquí ya corrigiste bien
-        "password": password,
-      }),
-    );
+    final headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    };
+
+    final bodyJson = jsonEncode({
+      "correo": email, 
+      "password": password,
+    });
+
+    // 🔹 DEBUG
+    print("LOGIN URL: $url");
+    print("Headers: $headers");
+    print("Body: $bodyJson");
+
+    final response = await http.post(url, headers: headers, body: bodyJson);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -27,28 +33,35 @@ class AuthService {
     }
   }
 
-  Future<bool> register(String nombre, String correo, String password) async {
-    final url = Uri.parse("$baseUrl/api/auth/register");
+  /// REGISTER
+ Future<bool> register(String nombre, String correo, String password) async {
+  final url = Uri.parse("$baseUrl/api/auth/registra");
 
-    final response = await http.post(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: jsonEncode({
-        "nombre": nombre,
-        "correo": correo,
-        "password": password,
-        "estado": 1,
-        "idRol": 1,
-      }),
-    );
+  final headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "User-Agent": "PostmanRuntime/7.32.0"
+  };
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return true; // registro exitoso
-    } else {
-      throw Exception("Error en registro: ${response.body}");
+  final bodyJson = jsonEncode({
+    "nombre": nombre,
+    "correo": correo,
+    "password": password,
+    "estado": 1,
+    "idRol": 1
+  });
+
+  print("REGISTER URL: $url");
+  print("Headers: $headers");
+  print("Body: $bodyJson");
+
+  final response = await http.post(url, headers: headers, body: bodyJson);
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    print("Registro exitoso: ${response.body}");
+    return true;
+  } else {
+    throw Exception("Error en registro: ${response.body}");
     }
   }
 }
