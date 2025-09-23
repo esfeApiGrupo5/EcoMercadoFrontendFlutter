@@ -35,7 +35,7 @@ class AuthService {
 
   /// REGISTER
  Future<bool> register(String nombre, String correo, String password) async {
-  final url = Uri.parse("$baseUrl/api/auth/registra");
+  final url = Uri.parse("$baseUrl/api/auth/registrar");
 
   final headers = {
     "Content-Type": "application/json",
