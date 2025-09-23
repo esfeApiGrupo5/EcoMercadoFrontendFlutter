@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart';
+import 'package:myapp/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,6 +11,37 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  void _login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final token = await _authService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (token != null) {
+        // 🔹 Guardar token en memoria segura si quieres (ej: shared_preferences)
+        Navigator.pushReplacementNamed(context, '/pokemon');
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +69,27 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Aquí luego llamas al API de login
-                print("Email: ${_emailController.text}, Password: ${_passwordController.text}");
-              },
-              child: const Text("Iniciar sesión"),
-            ),
+
+            if (_isLoading)
+              const CircularProgressIndicator()
+            else
+              ElevatedButton(
+                onPressed: _login,
+                child: const Text("Iniciar sesión"),
+              ),
+
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 15),
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ],
+
             const SizedBox(height: 10),
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RegisterPage()),
-                );
+                Navigator.pushNamed(context, '/register');
               },
               child: const Text("¿No tienes cuenta? Regístrate"),
             ),
