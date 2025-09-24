@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:myapp/services/auth_service.dart'; // para usar el token
 
 class BlogService {
   final String baseUrl = "https://api-gateway-8wvg.onrender.com";
@@ -10,11 +11,26 @@ class BlogService {
 
     final response = await http.get(
       url,
-      headers: {"Accept": "application/json"},
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer ${AuthService.token}", // token JWT
+      },
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final data = jsonDecode(response.body);
+
+      // Si la API devuelve un objeto con "content" (paginación)
+      if (data is Map<String, dynamic> && data.containsKey("content")) {
+        return data["content"];
+      }
+
+      // Si devuelve directamente una lista
+      if (data is List) {
+        return data;
+      }
+
+      throw Exception("Formato inesperado en la respuesta: $data");
     } else {
       throw Exception("Error al obtener blogs: ${response.body}");
     }
@@ -29,6 +45,7 @@ class BlogService {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
+        "Authorization": "Bearer ${AuthService.token}",
       },
       body: jsonEncode({
         "titulo": titulo,
@@ -47,7 +64,13 @@ class BlogService {
   Future<bool> deleteBlog(int id) async {
     final url = Uri.parse("$baseUrl/api/blogs/$id");
 
-    final response = await http.delete(url);
+    final response = await http.delete(
+      url,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer ${AuthService.token}",
+      },
+    );
 
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
@@ -65,6 +88,7 @@ class BlogService {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
+        "Authorization": "Bearer ${AuthService.token}",
       },
       body: jsonEncode({
         "titulo": titulo,
