@@ -5,6 +5,7 @@ import 'package:myapp/services/pokeapi_service.dart';
 // Importamos las nuevas pantallas
 import 'login_page.dart';
 import 'register_page.dart';
+import 'blog_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
         '/pokemon': (context) => const PokemonListScreen(),
+        '/blog': (context) => const BlogPage(),
       },
     );
   }

@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (token != null) {
         // 🔹 Guardar token en memoria segura si quieres (ej: shared_preferences)
-        Navigator.pushReplacementNamed(context, '/pokemon');
+        Navigator.pushReplacementNamed(context, '/blog');
       }
     } catch (e) {
       setState(() {
