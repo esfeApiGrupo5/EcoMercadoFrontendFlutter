@@ -3,10 +3,9 @@ import 'package:myapp/models/pokemon.dart';
 import 'package:myapp/services/pokeapi_service.dart';
 
 // Importamos las nuevas pantallas
-import 'pages/login_page.dart';
-import 'pages/register_page.dart';
-import 'pages/blog_page.dart';
-import 'config/theme.dart';
+import 'login_page.dart';
+import 'register_page.dart';
+import 'blog_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,12 +17,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // 🔹 quita la cinta roja de debug
-      title: 'Blog App',
-      theme: AppTheme.lightTheme,   // 🌞 Tema claro
-      darkTheme: AppTheme.darkTheme, // 🌙 Tema oscuro
-      themeMode: ThemeMode.system,   // 🔄 se adapta al sistema
-      initialRoute: '/login',        // 🔑 Pantalla inicial
+      title: 'PokeAPI App',
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      // Cambiamos home por initialRoute
+      initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
@@ -34,7 +31,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// 🔹 Pantalla Pokémon (demo, puedes quitarla después)
 class PokemonListScreen extends StatefulWidget {
   const PokemonListScreen({super.key});
 
@@ -56,6 +52,7 @@ class _PokemonListScreenState extends State<PokemonListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pokémon List'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: FutureBuilder<List<Pokemon>>(
         future: _pokemonList,
