@@ -6,7 +6,9 @@ import 'package:myapp/services/pokeapi_service.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
 import 'pages/blog_page.dart';
+import 'pages/product_page.dart';
 import 'config/theme.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/pokemon': (context) => const PokemonListScreen(),
         '/blog': (context) => const BlogPage(),
+        '/productos': (context) => const ProductPage(),
       },
     );
   }
