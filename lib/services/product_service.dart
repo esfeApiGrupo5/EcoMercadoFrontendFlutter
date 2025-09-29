@@ -7,20 +7,26 @@ class ProductService {
   final String baseUrl = "https://api-gateway-8wvg.onrender.com/api/productos";
 
   Future<List<Producto>> fetchProductos() async {
-    final url = Uri.parse(baseUrl);
-    final response = await http.get(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer ${AuthService.token}",
-      },
-    );
+    final response = await http.get(Uri.parse("$baseUrl/lista"));
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => Producto.fromJson(json)).toList();
+      final data = jsonDecode(response.body);
+
+      // 🔹 Si devuelve un array directo
+      if (data is List) {
+        return data.map((json) => Producto.fromJson(json)).toList();
+      }
+
+      // 🔹 Si devuelve un objeto con "content" (en caso de paginado)
+      if (data is Map && data.containsKey("content")) {
+        return (data["content"] as List)
+            .map((json) => Producto.fromJson(json))
+            .toList();
+      }
+
+      return [];
     } else {
-      throw Exception("Error al obtener productos: ${response.body}");
+      throw Exception("Error al cargar productos: ${response.statusCode}");
     }
   }
 

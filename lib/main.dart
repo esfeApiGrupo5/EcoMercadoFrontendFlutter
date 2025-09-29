@@ -7,8 +7,9 @@ import 'pages/login_page.dart';
 import 'pages/register_page.dart';
 import 'pages/blog_page.dart';
 import 'pages/product_page.dart';
+import 'pages/profile_page.dart';
 import 'config/theme.dart';
-
+import 'pages/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,6 +33,8 @@ class MyApp extends StatelessWidget {
         '/pokemon': (context) => const PokemonListScreen(),
         '/blog': (context) => const BlogPage(),
         '/productos': (context) => const ProductPage(),
+        '/home': (context) => const HomePage(),
+        '/profile': (context) => const ProfilePage(),
       },
     );
   }

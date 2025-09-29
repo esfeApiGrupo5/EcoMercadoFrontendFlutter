@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/services/auth_service.dart';
+import 'package:myapp/pages/home_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,8 +31,12 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (token != null) {
-        Navigator.pushReplacementNamed(context, '/blog');
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    }
+
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();

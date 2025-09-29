@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/pokemon': (context) => const PokemonListScreen(),
         '/blog': (context) => const BlogPage(),
+        
       },
     );
   }
